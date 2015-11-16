@@ -14,26 +14,19 @@ namespace ConnectWiseCollector
     {
         private static readonly ILog logger = LogManager.GetLogger(typeof(Program));
         private static Boolean sendToServer = true;
-        private static string type;
 
         static void Main(string[] args)
         {
             XmlConfigurator.Configure(new System.IO.FileInfo(args[0]));
             Boolean success = true;
-
-            if(args.Length > 1)
+            string type = null;
+            string filter = "";
+          
+            type = args[1];
+            filter = args[2];
+            if (args.Length > 3)
             {
-                for(int i = 1; i < args.Length; i++)
-                {
-                    if(args[i].Equals("debug"))
-                    {
-                        sendToServer = false;
-                    }
-                    else
-                    {
-                        type = args[i];
-                    }
-                }
+                sendToServer = false;
             }
             TheCollector theCollector = new TheCollector();
             theCollector.setSite(SoftbladeParameters.getParameter(SoftbladeParameters.SITE));
@@ -41,7 +34,7 @@ namespace ConnectWiseCollector
             theCollector.setUsername(SoftbladeParameters.getParameter(SoftbladeParameters.USERNAME));
             theCollector.setPassword(SoftbladeParameters.getParameter(SoftbladeParameters.PASSWORD));
 
-            logger.Info("SoftbladeParameters: " + SoftbladeParameters.DebugOutput());
+ //           logger.Info("SoftbladeParameters: " + SoftbladeParameters.DebugOutput());
             try
             {
                 string message = null;
@@ -49,28 +42,38 @@ namespace ConnectWiseCollector
                 switch (type.ToLower())
                 {
                     case "servicetickets":
-                        message = JsonConvert.SerializeObject(theCollector.CollectServiceTickets());
+                        message = JsonConvert.SerializeObject(theCollector.CollectServiceTickets(filter));
                         break;
                     case "agreements":
-                        message = JsonConvert.SerializeObject(theCollector.CollectAgreements());
+                        message = JsonConvert.SerializeObject(theCollector.CollectAgreements(filter));
+                        break;
+                    case "agreementtypes":
+                        message = JsonConvert.SerializeObject(theCollector.CollectAgreementTypes(filter));
+                        break;
+                    case "agreementadditions":
+                        message = JsonConvert.SerializeObject(theCollector.CollectAgreementAdditions(filter));
                         break;
                     case "companies":
-                        message = JsonConvert.SerializeObject(theCollector.CollectCompanyInfo());
+                        message = JsonConvert.SerializeObject(theCollector.CollectCompanyInfo(filter));
+                        break;
+                    case "company":
+                        int id = Int32.Parse(filter);
+                        message = JsonConvert.SerializeObject(theCollector.getCompany(id));
                         break;
                     case "projects":
-                        message = JsonConvert.SerializeObject(theCollector.CollectProjects());
+                        message = JsonConvert.SerializeObject(theCollector.CollectProjects(filter));
                         break;
                     case "invoices":
-                        message = JsonConvert.SerializeObject(theCollector.CollectInvoices());
+                        message = JsonConvert.SerializeObject(theCollector.CollectInvoices(filter));
                         break;
                     case "purchaseorders":
-                        message = JsonConvert.SerializeObject(theCollector.CollectPurchaseOrders());
+                        message = JsonConvert.SerializeObject(theCollector.CollectPurchaseOrders(filter));
                         break;
                     case "configurations":
-                        message = JsonConvert.SerializeObject(theCollector.CollectConfigurations());
+                        message = JsonConvert.SerializeObject(theCollector.CollectConfigurations(filter));
                         break;
                     case "manageddevices":
-                        message = JsonConvert.SerializeObject(theCollector.CollectManagedDevices("*"));
+                        message = JsonConvert.SerializeObject(theCollector.CollectManagedDevices(filter));
                         break;
                     default:
                         logger.Error("You need to specify a type on the command line");

@@ -18,11 +18,11 @@ namespace ConnectWiseCollector
         private string company;
         private string username;
         private string password;
-        private List<string> returnFields = new List<string>();
+        private List<string> returnFields =null;
 
         public void ConnectWiseCollector()
         {
-            returnFields.Add("Id");
+//            returnFields.Add("Id");
         }
 
         public void setSite(String tmp)
@@ -45,116 +45,92 @@ namespace ConnectWiseCollector
             password = tmp;
         }
 
-        public List<ServiceTicket> CollectServiceTickets()
+        public List<TicketFindResult> CollectServiceTickets(string filter)
         {
             ServiceTicketApi serviceTicketApi = new ServiceTicketApi(site, company, username, password, cookie);
-            List<ServiceTicket> tickets = new List<ServiceTicket>();
-
-            List<TicketFindResult> results = serviceTicketApi.FindServiceTickets("", null, null, null, null, returnFields);
+            List<TicketFindResult> results = serviceTicketApi.FindServiceTickets(filter, "Id", null, null, null, null);
             logger.Info("Found " + results.Count + " Service tickets");
 
-            foreach (TicketFindResult result in results)
-            {
-                logger.Info("Getting ticket details for: " + result.Id);
-                tickets.Add(serviceTicketApi.GetServiceTicket(result.Id));
-            }
-            return tickets;
+            return results;
         }
 
-        public List<Company> CollectCompanyInfo()
+        public List<CompanyFindResult> CollectCompanyInfo(string filter)
         {
             CompanyApi companyApi = new CompanyApi(site, company, username, password, cookie);
 
-            List<Company> companies = new List<Company>();
-
-            List<CompanyFindResult> results = companyApi.FindCompanies("", null, null, null, returnFields);
+            List<CompanyFindResult> results = companyApi.FindCompanies(filter, "Id", null, null, null);
             logger.Info("Found " + results.Count + " Companies");
-            foreach (CompanyFindResult result in results)
-            {
-                logger.Info("Getting company details for: " + result.Id);
-                companies.Add(companyApi.GetCompany(result.Id));
-            }
-            return companies;
+            return results;
         }
 
-        public List<Agreement> CollectAgreements()
+        public List<AgreementFindResult> CollectAgreements(string filter)
         {
             AgreementApi api = new AgreementApi(site, company, username, password, cookie);
 
-            List<Agreement> returnList = new List<Agreement>();
-            List<AgreementFindResult> results = api.FindAgreements("", "AgreementName", null, null, true, returnFields);
+            List<AgreementFindResult> results = api.FindAgreements(filter, "Id", null, null, true, null);
             logger.Info("Found " + results.Count + " agreements");
-            foreach (AgreementFindResult result in results)
-            {
-                logger.Info("Getting agreement details for: " + result.Id);
-                returnList.Add(api.GetAgreement(result.Id));
-            }
-            return returnList;
+            return results;
         }
 
-        public List<Project> CollectProjects()
+        public List<AgreementAdditionFindResult> CollectAgreementAdditions(string filter)
+        {
+            AgreementApi api = new AgreementApi(site, company, username, password, cookie);
+
+            List<AgreementAdditionFindResult> results = api.FindAgreementAdditions(filter, "Id", null, null, true, null);
+            logger.Info("Found " + results.Count + " agreement additions");
+            return results;
+        }
+
+        public List<AgreementWorkTypeFindResult> CollectAgreementTypes(string filter)
+        {
+            AgreementApi api = new AgreementApi(site, company, username, password, cookie);
+
+            List<AgreementWorkTypeFindResult> results = api.FindAgreementWorkTypes(filter, "Id", null, null, true, null);
+            logger.Info("Found " + results.Count + " agreement work types");
+            return results;
+        }
+
+        public Company getCompany(int id)
+        {
+            CompanyApi api = new CompanyApi(site, company, username, password, cookie);
+            return api.GetCompany(id);
+        }
+
+        public List<ProjectFindResult> CollectProjects(string filter)
         {
             ProjectApi api = new ProjectApi(site, company, username, password, cookie);
 
-            List<Project> returnList = new List<Project>();
-
-            List<ProjectFindResult> results = api.FindProjects("", null, null, null, null, returnFields);
+            List<ProjectFindResult> results = api.FindProjects(filter, "Id", null, null, null, returnFields);
             logger.Info("Found " + results.Count + " projects");
-            foreach (ProjectFindResult result in results)
-            {
-                logger.Info("Getting project details for: " + result.Id);
-                returnList.Add(api.GetProject(result.Id));
-            }
-            return returnList;
+            return results;
         }
 
-        public List<Invoice> CollectInvoices()
+        public List<InvoiceFindResult> CollectInvoices(string filter)
         {
             InvoiceApi api = new InvoiceApi(site, company, username, password, cookie);
 
-            List<Invoice> returnList = new List<Invoice>();
-
-            List<InvoiceFindResult> results = api.FindInvoices("", null, null, null, null, returnFields);
+            List<InvoiceFindResult> results = api.FindInvoices(filter, "Id", null, null, null, returnFields);
             logger.Info("Found " + results.Count + " invoices");
-            foreach (InvoiceFindResult result in results)
-            {
-                logger.Info("Getting agreement details for: " + result.Id);
-                returnList.Add(api.GetInvoice(result.Id));
-            }
-            return returnList;
+            return results;
         }
 
-        public List<PurchaseOrder> CollectPurchaseOrders()
+        public List<PurchaseOrderFindResult> CollectPurchaseOrders(string filter)
         {
             PurchasingApi api = new PurchasingApi(site, company, username, password, cookie);
 
-            List<PurchaseOrder> returnList = new List<PurchaseOrder>();
-
-            List<PurchaseOrderFindResult> results = api.FindPurchaseOrders("", null, null, null, returnFields);
+            List<PurchaseOrderFindResult> results = api.FindPurchaseOrders(filter, "Id", null, null, returnFields);
             logger.Info("Found " + results.Count + " purchase orders");
-            foreach (PurchaseOrderFindResult result in results)
-            {
-                logger.Info("Getting purchase order details for: " + result.Id);
-                returnList.Add(api.GetPurchaseOrder(result.Id));
-            }
-            return returnList;
+            return results;
         }
 
 
-        public List<Configuration> CollectConfigurations()
+        public List<ConfigurationFindResult> CollectConfigurations(string filter)
         {
             ConfigurationApi api = new ConfigurationApi(site, company, username, password, cookie);
 
-            List<Configuration> returnList = new List<Configuration>();
-
-            List<ConfigurationFindResult> results = api.FindConfigurations("", null, null, null, null, returnFields);
+            List<ConfigurationFindResult> results = api.FindConfigurations(filter, "Id", null, null, null, returnFields);
             logger.Info("Found " + results.Count + " Configurations");
-            foreach (ConfigurationFindResult result in results)
-            {
-                logger.Info("Getting Configuration details for: " + result.Id);
-                returnList.Add(api.GetConfiguration(result.Id));
-            }
-            return returnList;
+            return results;
         }
 
         public List<ManagedMachineData> CollectManagedDevices(string managedSolutionName)
@@ -162,9 +138,11 @@ namespace ConnectWiseCollector
  
             ManagedDeviceApi api = new ManagedDeviceApi(site, company, username, password, cookie);
 
-            List<ManagedMachineData> results = api.GetManagedServers(managedSolutionName, null);
-            results.AddRange(api.GetManagedWorkstations(managedSolutionName, null));
-            logger.Info("Found " + results.Count + " Managed Devices");
+            logger.Info("Getting managed servers for solutionName/GroupID: " + managedSolutionName);
+            List<ManagedMachineData> results = api.GetManagedServers(managedSolutionName, managedSolutionName);
+            logger.Info("Got " + results.Count + " managed servers, getting workstations now...");
+            results.AddRange(api.GetManagedWorkstations(managedSolutionName, managedSolutionName));
+            logger.Info("Found " + results.Count + " total managed Managed Devices");
             return results;
         }
     }
