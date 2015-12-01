@@ -57,11 +57,18 @@ namespace ConnectWiseCollector
                         message = JsonConvert.SerializeObject(theCollector.CollectCompanyInfo(filter));
                         break;
                     case "company":
-                        int id = Int32.Parse(filter);
-                        message = JsonConvert.SerializeObject(theCollector.getCompany(id));
+                        int companyId = Int32.Parse(filter);
+                        message = JsonConvert.SerializeObject(theCollector.getCompany(companyId));
+                        break;
+                    case "serviceticket":
+                        int ticketId = Int32.Parse(filter);
+                        message = JsonConvert.SerializeObject(theCollector.getTicket(ticketId));
                         break;
                     case "projects":
                         message = JsonConvert.SerializeObject(theCollector.CollectProjects(filter));
+                        break;
+                    case "products":
+                        message = JsonConvert.SerializeObject(theCollector.CollectProducts(filter));
                         break;
                     case "invoices":
                         message = JsonConvert.SerializeObject(theCollector.CollectInvoices(filter));

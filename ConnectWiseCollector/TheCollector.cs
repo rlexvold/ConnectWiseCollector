@@ -45,13 +45,42 @@ namespace ConnectWiseCollector
             password = tmp;
         }
 
-        public List<TicketFindResult> CollectServiceTickets(string filter)
+        public List<ServiceTicket> CollectServiceTickets(string filter)
+        {
+            List<string> fields = new List<string>();
+            fields.Add("Id");
+            ServiceTicketApi serviceTicketApi = new ServiceTicketApi(site, company, username, password, cookie);
+            List<TicketFindResult> results = serviceTicketApi.FindServiceTickets(filter, "Id", null, null, null, fields);
+            logger.Info("Found " + results.Count + " Service tickets. Getting detailed ticket info...");
+            List<ServiceTicket> fullTickets = new List<ServiceTicket>();
+            int i = 0;
+            foreach (TicketFindResult ticket in results)
+            {
+                i++;
+                if ((i % 100) == 0)
+                    logger.Info(i);
+            
+                try
+                {
+                    ServiceTicket ticketDetail = serviceTicketApi.GetServiceTicket(ticket.Id);
+
+                    if (ticketDetail != null)
+                        fullTickets.Add(ticketDetail);
+                    else
+                        logger.Info("Ticket details not found for: " + ticket.Id);
+                }
+                catch (Exception e)
+                {
+                    logger.Error("Error getting ticket: " + ticket.Id + " - " + e.Message);
+                }
+            }
+            return fullTickets;
+        }
+
+        public ServiceTicket getTicket(int ticketId)
         {
             ServiceTicketApi serviceTicketApi = new ServiceTicketApi(site, company, username, password, cookie);
-            List<TicketFindResult> results = serviceTicketApi.FindServiceTickets(filter, "Id", null, null, null, null);
-            logger.Info("Found " + results.Count + " Service tickets");
-
-            return results;
+            return serviceTicketApi.GetServiceTicket(ticketId);
         }
 
         public List<CompanyFindResult> CollectCompanyInfo(string filter)
@@ -124,12 +153,44 @@ namespace ConnectWiseCollector
         }
 
 
+        public List<ProductFindResult> CollectProducts(string filter)
+        {
+            ProductApi api = new ProductApi(site, company, username, password, cookie);
+
+            List<ProductFindResult> results = api.FindProducts(filter, "Id", null, null, returnFields);
+            logger.Info("Found " + results.Count + " products");
+            return results;
+        }
+
+
         public List<ConfigurationFindResult> CollectConfigurations(string filter)
         {
             ConfigurationApi api = new ConfigurationApi(site, company, username, password, cookie);
 
             List<ConfigurationFindResult> results = api.FindConfigurations(filter, "Id", null, null, null, returnFields);
             logger.Info("Found " + results.Count + " Configurations");
+            return results;
+        }
+
+        public List<TicketProduct> CollectTicketProductList(int ticketId)
+        {
+            ServiceTicketApi api = new ServiceTicketApi(site, company, username, password, cookie);
+
+            List<TicketProduct> results = api.GetTicketProductList(ticketId);
+            if (results == null)
+                results = new List<TicketProduct>();
+            logger.Info("Found " + results.Count + " Ticket Products");
+            return results;
+        }
+
+        public List<DocumentInfo> CollectTicketDocuments(int ticketId)
+        {
+            ServiceTicketApi api = new ServiceTicketApi(site, company, username, password, cookie);
+
+            List<DocumentInfo> results = api.GetTicketDocuments(ticketId);
+            if (results == null)
+                results = new List<DocumentInfo>();
+            logger.Info("Found " + results.Count + " Ticket documents");
             return results;
         }
 
